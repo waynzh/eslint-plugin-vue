@@ -29,7 +29,7 @@ tester.run('custom-event-name-casing', rule, {
         setup(props, context) {
           return {
             onInput(value) {
-              context.emit('update:fooBar', value)
+              context.emit('update:foo-bar', value)
               context.emit('foo-bar')
             }
           }
@@ -49,21 +49,21 @@ tester.run('custom-event-name-casing', rule, {
       code: `
       <template>
         <input
-          @click="$emit('update:fooBar', value)">
+          @click="$emit('update:foo-bar', value)">
       </template>
       <script>
       export default {
         setup(props, {emit}) {
           return {
             onInput(value) {
-              emit('update:fooBar', value)
+              emit('update:foo-bar', value)
               emit('foo-bar')
             }
           }
         },
         methods: {
           onClick() {
-            this.$emit('update:fooBar', value)
+            this.$emit('update:foo-bar', value)
           }
         }
       }
@@ -516,8 +516,8 @@ tester.run('custom-event-name-casing', rule, {
       filename: 'test.vue',
       code: `
       <template>
-        <input
-          @click="$emit('foo-bar')">
+        <input @click="$emit('foo-bar')">
+        <input @click="$emit('update:foo-bar')">
       </template>
       <script>
       export default {
@@ -525,12 +525,14 @@ tester.run('custom-event-name-casing', rule, {
           return {
             onInput(value) {
               context.emit('bar-baz')
+              context.emit('update:bar-baz')
             }
           }
         },
         methods: {
           onClick() {
             this.$emit('baz-qux')
+            this.$emit('update:baz-qux')
           }
         }
       }
@@ -539,8 +541,11 @@ tester.run('custom-event-name-casing', rule, {
       options: ['camelCase'],
       errors: [
         "Custom event name 'foo-bar' must be camelCase.",
+        "Custom event name 'update:foo-bar' must be camelCase.",
         "Custom event name 'bar-baz' must be camelCase.",
-        "Custom event name 'baz-qux' must be camelCase."
+        "Custom event name 'update:bar-baz' must be camelCase.",
+        "Custom event name 'baz-qux' must be camelCase.",
+        "Custom event name 'update:baz-qux' must be camelCase."
       ]
     },
     // Default
@@ -582,12 +587,18 @@ tester.run('custom-event-name-casing', rule, {
       const emit = defineEmits({})
       emit('fooBar')
       emit('foo-bar')
+      emit('update:fooBar')
+      emit('update:foo-bar')
       </script>
       `,
       errors: [
         {
           message: "Custom event name 'foo-bar' must be camelCase.",
           line: 5
+        },
+        {
+          message: "Custom event name 'update:foo-bar' must be camelCase.",
+          line: 7
         }
       ]
     },
